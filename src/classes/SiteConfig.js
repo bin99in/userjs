@@ -1,12 +1,15 @@
+// there are two methods to make a front-end router, through history API or hash field.
+// if applying this class to single page application, must be concerned above.
+// so far, I don't implement this.
+
 /* global unsafeWindow */
 
 export default class SiteConfig {
   static instances = []
   url = new URL(unsafeWindow.document.URL)
 
-  constructor (hostname, pathnameMap) {
-    this.hostname = hostname
-    this.pathnameMap = pathnameMap
+  constructor (config) {
+    this.config = config
     SiteConfig.instances.push(this)
   }
 
@@ -14,22 +17,26 @@ export default class SiteConfig {
     SiteConfig.instances.forEach(instance => instance.init())
   }
 
-  init () {
-    if (this.hostname !== this.url.hostname) return
-    // 精确匹配
-    const alwaysLoad = this.pathnameMap.get('')
-    alwaysLoad && alwaysLoad()
-    const handler = this.pathnameMap.get(this.url.pathname)
-    handler && handler()
-    // 正则匹配
-    for(const key of this.pathnameMap.keys()){
-      if (key instanceof RegExp && key.test(this.url.pathname)){
-        const handler = this.pathnameMap.get(key)
-        handler && handler()
+  #match (beMatchedString, map) {
+    const matched = []
+    for (const [key, val] of map.entries()){
+      if (typeof key === 'string'){
+      // 精确匹配
+        key === beMatchedString && matched.push(val)
+      } else if (key instanceof RegExp){
+      // 正则匹配
+        key.test(beMatchedString) && matched.push(val)
       }
     }
+    return matched
+  }
+
+  init () {
+    const matchedpathMaps = this.#match(this.url.hostname, this.config);
+    const matchedMethods = matchedpathMaps.reduce((acc, pathMap) => {
+      const methods = this.#match(this.url.pathname, pathMap)
+      return acc.concat(methods)
+    }, []);
+    matchedMethods.forEach(item => item())
   }
 }
-// there are two methods to make a front-end router, through history API or hash field.
-// if applying this class to single page application, must be concerned above.
-// so far, I don't implement this.

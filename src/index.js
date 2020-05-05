@@ -13,5 +13,7 @@ import './sites/zhihu.js'
 import './sites/nintendo.js'
 import './sites/jianshu.js'
 import './sites/bilibili.js'
+import './sites/jd.js'
+import './sites/youneed.win.js'
 
 SiteConfig.init()

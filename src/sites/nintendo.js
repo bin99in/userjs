@@ -3,12 +3,15 @@
 import SiteConfig from '../classes/SiteConfig.js'
 
 const unsafeDoc = unsafeWindow.document
-const hostname = 'accounts.nintendo.com'
-const pathnameMap = new Map()
-pathnameMap.set('/profile/edit', () => {
-  addCityButton()
-})
+const config = new Map([
+  ['accounts.nintendo.com', new Map([
+    ['/profile/edit', () => {
+      addCityButton()
+    }]
+  ])]
+])
 
+/** 页面上添加城市按键，方便换区 */
 function addCityButton () {
   const cityMap = new Map([
     [153, '美国'],
@@ -35,7 +38,4 @@ function addCityButton () {
   line.parentNode.insertBefore(fragment, line)
 }
 
-export default new SiteConfig(
-  hostname,
-  pathnameMap
-)
+export default new SiteConfig(config)

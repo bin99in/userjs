@@ -3,14 +3,17 @@
 import SiteConfig from '../classes/SiteConfig.js'
 
 const unsafeDoc = unsafeWindow.document
-const hostname = 'www.bilibili.com'
-const pathnameMap = new Map()
-pathnameMap.set('', () => {
-})
-pathnameMap.set(new RegExp('^/video/'), () => {
-  videoFullscreen()
-})
+const config = new Map([
+  ['www.bilibili.com', new Map([
+    [new RegExp(''), () => {
+    }],
+    [new RegExp('^/video/'), () => {
+      videoFullscreen()
+    }]
+  ])]
+])
 
+/** 添加双击全屏 */
 function videoFullscreen () {
   const loadInterval = 500
   const clickInterval = 200
@@ -41,7 +44,4 @@ function videoFullscreen () {
   }, { capture: true })
 }
 
-export default new SiteConfig(
-  hostname,
-  pathnameMap
-)
+export default new SiteConfig(config)

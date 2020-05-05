@@ -1,4 +1,4 @@
-/* global unsafeWindow GM_addStyle */
+/* global unsafeWindow */
 
 // ==UserScript==
 // @grant        GM_addStyle
@@ -7,25 +7,36 @@
 import SiteConfig from '../classes/SiteConfig.js'
 
 const unsafeDoc = unsafeWindow.document
-const hostname = 'www.zhihu.com'
-const pathnameMap = new Map()
-pathnameMap.set('', () => {
-  blockPopups()
-  directFollowLink()
-})
+const config = new Map([
+  ['www.zhihu.com', new Map([
+    [new RegExp(''), () => {
+      blockPopups()
+    }]
+  ])],
+  // 二级域名为zhihu的所用链接
+  [new RegExp('(\\w.)+zhihu.com'), new Map([
+    [new RegExp(''), () => {
+      directFollowLink()
+    }]
+  ])]
+])
 
+/** 未登入时，页面不定时会弹窗提示登入。block
+    BUG 有时导致页面无法滚动, Vimium不影响
+*/
 function blockPopups () {
-  GM_addStyle('.Modal-wrapper.undefined.Modal-enter-done{display: none !important;}')
-  const timer = setInterval(() => {
-    const element = unsafeDoc.body.lastChild
-    const isContainPopups = element.querySelector('.Modal-wrapper')
+  // const timer =
+  setInterval(() => {
+    const body = unsafeDoc.body
+    const isContainPopups = body.querySelector('.signFlowModal')
     if (isContainPopups) {
-      element.querySelector('[aria-label="关闭"]').click()
-      clearInterval(timer)
+      body.querySelector('[aria-label="关闭"]').click()
+      // clearInterval(timer)
     }
   }, 60)
 }
 
+/** 外部链接直接访问 */
 function directFollowLink () {
   const queryRefs = () => unsafeDoc.querySelectorAll('a')
   const handler = function (e) {
@@ -48,7 +59,4 @@ function directFollowLink () {
   }, 1000)
 }
 
-export default new SiteConfig(
-  hostname,
-  pathnameMap
-)
+export default new SiteConfig(config)
