@@ -15,31 +15,38 @@ const config = new Map([
 
 /** 添加双击全屏 */
 function videoFullscreen () {
-  const loadInterval = 500
-  const clickInterval = 200
+  const clickInterval = 300
   const fullscreenBtnName = '.bilibili-player-video-btn-fullscreen'
-  const pauseBtnName = '.bilibili-player-iconfont-start'
-  const fullscreenBtn = unsafeDoc.querySelector(fullscreenBtnName)
-  const pauseBtn = unsafeDoc.querySelector(pauseBtnName)
-  // 未获取到Btn，推迟后继续获取（视频控件在加载）
-  if (!fullscreenBtn) {
-    setTimeout(videoFullscreen, loadInterval)
-    return
-  }
   const cache = {
-    priorClickTimestamp: 0,
-    timer: null
+    prevClickTimestamp: 0,
+    timer: null,
+    isExcuteDefault: false
   }
-  const videoEle = unsafeDoc.querySelector('video')
-  videoEle.addEventListener('click', function (e) {
-    e.stopPropagation()
-    if (Date.now() - cache.priorClickTimestamp < clickInterval) {
-      fullscreenBtn.click()
+  unsafeDoc.body.addEventListener('click', function (e) {
+    const dispatchDefaultAction = () => {
+      cache.isExcuteDefault = true
+      const { bubbles, cancelable, composed } = e
+      const event = new Event(e.type, { bubbles, cancelable, composed })
+      e.target.dispatchEvent(event)
+    }
+    if (cache.isExcuteDefault) {
+      // 手动派发的事件，仅取消标记，让这次触发正常冒泡
+      cache.isExcuteDefault = false
+    } else if (e.target.matches('video')) {
+      // 拦截目标元素事件
       clearTimeout(cache.timer)
+      e.stopImmediatePropagation()
+      if (clickInterval > Date.now() - cache.prevClickTimestamp) {
+        // 双击间的间隔符合预设，全屏
+        unsafeDoc.querySelector(fullscreenBtnName).click()
+      } else {
+        // 推迟默认事件执行
+        cache.prevClickTimestamp = Date.now()
+        cache.timer = setTimeout(() => dispatchDefaultAction(), clickInterval)
+      }
     } else {
-      clearTimeout(cache.timer)
-      cache.priorClickTimestamp = Date.now()
-      cache.timer = setTimeout(() => pauseBtn.click(), clickInterval)
+      // 立即执行，不影响视频控件以外的交互
+      dispatchDefaultAction()
     }
   }, { capture: true })
 }
