@@ -7,7 +7,7 @@ const config = new Map([
   ['www.bilibili.com', new Map([
     [new RegExp(''), () => {
     }],
-    [new RegExp('^/video/'), () => {
+    [new RegExp('^(/video/)|(/bangumi/)'), () => {
       videoFullscreen()
       tweakSpeed()
     }]
