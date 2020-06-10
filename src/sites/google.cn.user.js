@@ -12,15 +12,29 @@ const config = new Map([
   ])]
 ])
 
-// 粘贴时将空白符号、连续空白符替换为单个空格
+// 拦截paste事件，将空白符号、连续空白符替换为单个空格，始终粘贴到输入框
 function pasteProcess() {
-  const inputArea = document.querySelector('#source')
-  inputArea.addEventListener('paste', function(e) {
+  const config = {
+    inputAreaSelector: '#source'
+  }
+  const cache = {
+    inputArea: document.querySelector('#source')
+  }
+  const action = {
+    paste(e, str, selectMode = 'end') {
+      str = str || (e.clipboardData || window.clipboardData)
+        .getData('text')
+        .replace(/\s+/g, ' ')
+      const ele = cache.inputArea
+      if (unsafeDoc.activeElement !== cache.inputArea) {
+        ele.select()
+      }
+      ele.setRangeText(str, ele.selectionStart, ele.selectionEnd, selectMode)
+    }
+  }
+  window.addEventListener('paste', function(e) {
     e.preventDefault()
-    const originPaste = (e.clipboardData || window.clipboardData).getData('text');
-    const t = e.target
-    const replacedPaste = originPaste.replace(/\s+/g, ' ')
-    t.setRangeText(replacedPaste, t.selectionStart, t.selectionEnd, 'end')
+    action.paste(e)
   })
 }
 
