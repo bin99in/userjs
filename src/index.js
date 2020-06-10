@@ -9,11 +9,12 @@
 
 // @require      file:///Users/bin99/Project/site-user-script/dist/userscript.bundle.js
 import SiteConfig from './classes/SiteConfig.js'
-import './sites/zhihu.js'
-import './sites/nintendo.js'
-import './sites/jianshu.js'
-import './sites/bilibili.js'
-import './sites/jd.js'
-import './sites/youneed.win.js'
+import './sites/zhihu.com.user.js'
+import './sites/nintendo.com.user.js'
+import './sites/jianshu.com.user.js'
+import './sites/bilibili.com.user.js'
+import './sites/jd.com.user.js'
+import './sites/youneed.win.user.js'
+import './sites/google.cn.user.js'
 
 SiteConfig.init()

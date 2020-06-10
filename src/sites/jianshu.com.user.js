@@ -7,9 +7,6 @@ const config = new Map([
   ['www.jianshu.com', new Map([
     [new RegExp(''), () => {
       directFollowLink()
-      setTimeout(() => {
-        removeHeaderAndFooter()
-      }, 1000)
     }]
   ])]
 ])
@@ -35,14 +32,6 @@ function directFollowLink () {
   setInterval(() => {
     queryRefs().forEach(ref => refs.includes(ref) || refs.push(ref) & addHandler(ref))
   }, 1000)
-}
-
-/** 移除头尾，专注内容 */
-function removeHeaderAndFooter () {
-  const header = unsafeDoc.querySelector('header')
-  header.parentNode.removeChild(header)
-  const footer = unsafeDoc.querySelector('footer:nth-last-of-type(1)')
-  footer.parentNode.removeChild(footer)
 }
 
 export default new SiteConfig(config)
