@@ -17,7 +17,7 @@ const config = new Map([
 /** 双击全屏 */
 function videoFullscreen () {
   const config = {
-    maxClickInterval: 300,
+    maxClickInterval: 500,
     getFullscreenBtn() {
       const fullscreenBtnName = '.bilibili-player-video-btn-fullscreen'
       return document.querySelector(fullscreenBtnName)
@@ -59,10 +59,7 @@ function videoFullscreen () {
 /** 切换播放速度 shift + arrow left | arrow right  */
 function tweakSpeed() {
   const config = {
-    modifier: (function(){
-      // return !navigator.userAgent.includes('Mac OS X') ? 'Meta' : 'Control'
-      return 'Shift'
-    })(),
+    modifier:  'Shift',
     speedBtnClassName: '.bilibili-player-video-btn-speed-menu-list',
     getTargetSpeedBtn() {
       const selector = config.speedBtnClassName + '[data-value="' + cache.currentSpeed + '"]';
@@ -102,6 +99,8 @@ function tweakSpeed() {
       }
     }
   }
+
+  // 修饰符flag
   unsafeDoc.body.addEventListener('keydown', function(e) {
     if (e.key === config.modifier) {
       cache.isModifierDown = true
@@ -112,6 +111,8 @@ function tweakSpeed() {
       cache.isModifierDown = false
     }
   }, { capture: true })
+
+  // 派发
   unsafeDoc.body.addEventListener('keydown', function(e) {
     if (cache.isModifierDown) {
       switch(e.key){
